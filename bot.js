@@ -37,6 +37,7 @@ const baseEmbed = new Discord.MessageEmbed()
 
 bot.on("ready", () => {
   console.log(`Logged in as ${bot.user.tag}!`);
+  client.user.setPresence({ activity: { name: `for help type ${env.prefix}help` , type: "WATCHING", url: "https://github.com/wout-junius/BE_COVID_Discord_Bot"}, status: 'online' })
 });
 
 bot.on("message", msg => {
