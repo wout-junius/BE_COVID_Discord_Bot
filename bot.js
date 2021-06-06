@@ -39,7 +39,7 @@ bot.on("message", msg => {
         let helpEmbed = new Discord.MessageEmbed()
         .setColor("#0099ff")
         .setTitle("Help")
-        .setDescription("every command starts with `" + env.prefix + " covid`")
+        .setDescription("every command starts with " + env.prefix + " covid")
         .addFields(
           { name: 'cases', value: 'Gives the covid cases for each province. \nProvince can be specified at the end' },
           { name: 'hospitalisations', value: 'Gives the covid hospitalisations for each province.\nProvince can be specified at the end' },
