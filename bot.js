@@ -23,36 +23,60 @@ let belgiumCases = {
   Brussels: 0
 };
 
+const exampleEmbed = new Discord.MessageEmbed()
+.setColor("#0099ff")
+.setTitle("Covid info")
+.setThumbnail(
+  "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
+)
+.setTimestamp()
+.setFooter(
+  "Made whit the EpiStat API",
+  "https://healthdata.sciensano.be/sites/default/files/logo-hr.png"
+);
+
 bot.on("ready", () => {
   console.log(`Logged in as ${bot.user.tag}!`);
 });
 
 bot.on("message", msg => {
   if (msg.content.startsWith(env.prefix)) {
-    let args = msg.content.substring(env.prefix.length).split(" ");
-    let command = args[1].toLowerCase();
+    let args = msg.content
+      .substring(env.prefix.length, msg.content.length)
+      .split(" ");
+    let command = args[0].toLowerCase();
     switch (command) {
       case "covid":
         covidCommand(msg.channel, args);
         break;
       case "help":
         let helpEmbed = new Discord.MessageEmbed()
-        .setColor("#0099ff")
-        .setTitle("Help")
-        .setDescription("every command starts with `" + env.prefix + " covid`")
-        .addFields(
-          { name: 'cases', value: 'Gives the covid cases for each province. \nProvince can be specified at the end' },
-          { name: 'hospitalisations', value: 'Gives the covid hospitalisations for each province.\nProvince can be specified at the end' },
-          { name: 'vaccines', value: 'Gives the covid first and second vacinations for each region. Province can be specified at the end' }
-        )
-        .setThumbnail(
-          "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-        )
-        .setFooter(
-          "Made by woutyboy3#1234 \nhttps://github.com/wout-junius",
-          "https://avatars.githubusercontent.com/u/17813748?v=4"
-        );
-        msg.channel.send(helpEmbed)
+          .setColor("#0099ff")
+          .setTitle("Help")
+          .setDescription("every command starts with `" + env.prefix + "covid`")
+          .addFields(
+            {
+              name: "cases",
+              value:
+                "Gives the covid cases for each province. \nProvince can be specified at the end"
+            },
+            {
+              name: "hospitalisations",
+              value:
+                "Gives the covid hospitalisations for each province.\nProvince can be specified at the end"
+            },
+            {
+              name: "vaccines",
+              value:
+                "Gives the covid first and second vacinations for each region."
+            }
+          )
+          .setThumbnail("https://info.girbau.com/hubfs/COVID_pckLogo-200.png")
+          .setFooter(
+            "Made by woutyboy3#1234 \nhttps://github.com/wout-junius",
+            "https://avatars.githubusercontent.com/u/17813748?v=4"
+          );
+        msg.channel.send(helpEmbed);
         break;
     }
   }
@@ -61,18 +85,13 @@ bot.on("message", msg => {
 bot.login(env.token);
 
 function covidCommand(channel, args) {
-  switch (args[2].toLowerCase()) {
+  switch (args[1].toLowerCase()) {
     case "cases":
-      if (args.length <= 3) {
+      if (args.length <= 2) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.json`)
           .then(res => res.json())
           .then(json => {
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor("#0099ff")
-              .setTitle("Covid info")
-              .setThumbnail(
-                "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-              )
+            exampleEmbed
               .setTimestamp()
               .setFooter(
                 "Made whit the EpiStat API",
@@ -107,33 +126,24 @@ function covidCommand(channel, args) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.json`)
           .then(res => res.json())
           .then(json => {
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor("#0099ff")
-              .setTitle("Covid info")
+            exampleEmbed
               .setDescription(`Current cases by province`)
-              .setThumbnail(
-                "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-              )
               .setTimestamp()
-              .setFooter(
-                "Made whit the EpiStat API",
-                "https://healthdata.sciensano.be/sites/default/files/logo-hr.png"
-              );
             let cases = 0;
             json.forEach(element => {
-              if (element.PROVINCE == args[3]) {
+              if (element.PROVINCE == args[2]) {
                 cases += parseInt(element.CASES);
               }
             });
 
-            exampleEmbed.addField(args[3], cases, true);
+            exampleEmbed.addField(args[2], cases, true);
 
             channel.send(exampleEmbed);
           });
       }
       break;
     case "hospitalisations":
-      if (args.length <= 3) {
+      if (args.length <= 2) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_HOSP.json`)
           .then(res => res.json())
           .then(json => {
@@ -168,7 +178,7 @@ function covidCommand(channel, args) {
               }
             });
             exampleEmbed.setDescription(
-              `Current hospitalisations in Belgium as of ${
+              `hospitalisations in Belgium as of ${
                 json[json.length - 1].DATE
               }\n ${total}`
             );
@@ -182,58 +192,50 @@ function covidCommand(channel, args) {
             channel.send(exampleEmbed);
           });
       } else {
-        fetch(`https://epistat.sciensano.be/Data/COVID19BE_HOSP.json`)
-          .then(res => res.json())
-          .then(json => {
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor("#0099ff")
-              .setTitle("Covid info")
-              .setDescription(
-                `Current hospitalisations by province as of ${
-                  json[json.length - 1].DATE
-                }`
-              )
-              .setThumbnail(
-                "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-              )
-              .setTimestamp()
-              .setFooter(
-                "Made whit the EpiStat API",
-                "https://healthdata.sciensano.be/sites/default/files/logo-hr.png"
-              );
-            let cases = 0;
-            json.forEach(element => {
-              if (
-                element.PROVINCE == args[3] &&
-                element.DATE == json[json.length - 1].DATE
-              ) {
-                cases += parseInt(element.TOTAL_IN);
-              }
+        let exist = false;
+        for (var key in belgiumCases) {
+          if (belgiumCases.hasOwnProperty(key)) {
+            if (key == args[2]) exist = true;
+          }
+        }
+        if (exist) {
+          fetch(`https://epistat.sciensano.be/Data/COVID19BE_HOSP.json`)
+            .then(res => res.json())
+            .then(json => {
+              exampleEmbed
+                .setDescription(
+                  `hospitalisations by province as of ${
+                    json[json.length - 1].DATE
+                  }`
+                )
+                .setTimestamp()
+              let cases = 0;
+              json.forEach(element => {
+                if (
+                  element.PROVINCE == args[2] &&
+                  element.DATE == json[json.length - 1].DATE
+                ) {
+                  cases += parseInt(element.TOTAL_IN);
+                }
+              });
+
+              exampleEmbed.addField(args[2], cases, true);
+
+              channel.send(exampleEmbed);
             });
+        }else {
 
-            exampleEmbed.addField(args[3], cases, true);
-
-            channel.send(exampleEmbed);
-          });
+        }
       }
       break;
 
     case "vaccines":
-      if (args.length <= 3) {
+      if (args.length <= 2) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_VACC.json`)
           .then(res => res.json())
           .then(json => {
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor("#0099ff")
-              .setTitle("Covid info")
-              .setThumbnail(
-                "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-              )
+            exampleEmbed
               .setTimestamp()
-              .setFooter(
-                "Made whit the EpiStat API",
-                "https://healthdata.sciensano.be/sites/default/files/logo-hr.png"
-              );
             let totalA = 0;
             let totalB = 0;
             let today = new Date();
@@ -273,33 +275,6 @@ function covidCommand(channel, args) {
                 exampleEmbed.addField(key, vaccineByRegion[key][1], true);
               }
             }
-
-            channel.send(exampleEmbed);
-          });
-      } else {
-        fetch(`https://epistat.sciensano.be/Data/COVID19BE_VACC.json`)
-          .then(res => res.json())
-          .then(json => {
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor("#0099ff")
-              .setTitle("Covid info")
-              .setDescription(`Current vaccinated by region`)
-              .setThumbnail(
-                "https://info.girbau.com/hubfs/COVID_pckLogo-200.png"
-              )
-              .setTimestamp()
-              .setFooter(
-                "Made whit the EpiStat API",
-                "https://healthdata.sciensano.be/sites/default/files/logo-hr.png"
-              );
-            let cases = 0;
-            json.forEach(element => {
-              if (element.REGION == args[3]) {
-                cases += parseInt(element.COUNT);
-              }
-            });
-
-            exampleEmbed.addField(args[3], cases, true);
 
             channel.send(exampleEmbed);
           });
