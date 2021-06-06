@@ -1,1 +1,1 @@
-# BE_COVID_Discord_Bot
+# BE COVID Discord Bot
