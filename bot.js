@@ -23,7 +23,7 @@ let belgiumCases = {
   Brussels: 0
 };
 
-const exampleEmbed = new Discord.MessageEmbed()
+const baseEmbed = new Discord.MessageEmbed()
 .setColor("#0099ff")
 .setTitle("Covid info")
 .setThumbnail(
@@ -85,13 +85,14 @@ bot.on("message", msg => {
 bot.login(env.token);
 
 function covidCommand(channel, args) {
+  baseEmbed.fields = [];
   switch (args[1].toLowerCase()) {
     case "cases":
       if (args.length <= 2) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.json`)
           .then(res => res.json())
           .then(json => {
-            exampleEmbed
+            baseEmbed
               .setTimestamp()
               .setFooter(
                 "Made whit the EpiStat API",
@@ -112,21 +113,21 @@ function covidCommand(channel, args) {
                 }
               }
             });
-            exampleEmbed.setDescription(`Current cases in Belgium \n ${total}`);
+            baseEmbed.setDescription(`Current cases in Belgium \n ${total}`);
 
             for (var key in belgiumCases) {
               if (belgiumCases.hasOwnProperty(key)) {
-                exampleEmbed.addField(key, belgiumCases[key], true);
+                baseEmbed.addField(key, belgiumCases[key], true);
               }
             }
 
-            channel.send(exampleEmbed);
+            channel.send(baseEmbed);
           });
       } else {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.json`)
           .then(res => res.json())
           .then(json => {
-            exampleEmbed
+            baseEmbed
               .setDescription(`Current cases by province`)
               .setTimestamp()
             let cases = 0;
@@ -136,9 +137,9 @@ function covidCommand(channel, args) {
               }
             });
 
-            exampleEmbed.addField(args[2], cases, true);
+            baseEmbed.addField(args[2], cases, true);
 
-            channel.send(exampleEmbed);
+            channel.send(baseEmbed);
           });
       }
       break;
@@ -202,7 +203,7 @@ function covidCommand(channel, args) {
           fetch(`https://epistat.sciensano.be/Data/COVID19BE_HOSP.json`)
             .then(res => res.json())
             .then(json => {
-              exampleEmbed
+              baseEmbed
                 .setDescription(
                   `hospitalisations by province as of ${
                     json[json.length - 1].DATE
@@ -219,9 +220,9 @@ function covidCommand(channel, args) {
                 }
               });
 
-              exampleEmbed.addField(args[2], cases, true);
+              baseEmbed.addField(args[2], cases, true);
 
-              channel.send(exampleEmbed);
+              channel.send(baseEmbed);
             });
         }else {
 
@@ -234,7 +235,7 @@ function covidCommand(channel, args) {
         fetch(`https://epistat.sciensano.be/Data/COVID19BE_VACC.json`)
           .then(res => res.json())
           .then(json => {
-            exampleEmbed
+            baseEmbed
               .setTimestamp()
             let totalA = 0;
             let totalB = 0;
@@ -259,24 +260,24 @@ function covidCommand(channel, args) {
                 }
               }
             });
-            exampleEmbed.setDescription(
+            baseEmbed.setDescription(
               `Current first dose vaccinated in Belgium \n **First**: ${totalA}   **Second**: ${totalB}\n \n **First dose** \n -----------`
             );
 
             for (var key in vaccineByRegion) {
               if (vaccineByRegion.hasOwnProperty(key)) {
-                exampleEmbed.addField(key, vaccineByRegion[key][0], true);
+                baseEmbed.addField(key, vaccineByRegion[key][0], true);
               }
             }
-            exampleEmbed.addField("\u200B", "\u200B");
-            exampleEmbed.addField("Second dose", "-----------");
+            baseEmbed.addField("\u200B", "\u200B");
+            baseEmbed.addField("Second dose", "-----------");
             for (var key in vaccineByRegion) {
               if (vaccineByRegion.hasOwnProperty(key)) {
-                exampleEmbed.addField(key, vaccineByRegion[key][1], true);
+                baseEmbed.addField(key, vaccineByRegion[key][1], true);
               }
             }
 
-            channel.send(exampleEmbed);
+            channel.send(baseEmbed);
           });
       }
 
